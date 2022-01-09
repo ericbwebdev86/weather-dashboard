@@ -1,4 +1,5 @@
 //GIVEN a weather dashboard with form inputs
+
 let appID = "&appid=a1a6bda4ff081633f2f7eb1de4acaa4e";
 let search = $("#searchBtn");
 let index = 0;
