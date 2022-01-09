@@ -1,22 +1,5 @@
 //GIVEN a weather dashboard with form inputs
-
-//WHEN I search for a city
-//THEN I am presented with current and future conditions for that city and that city is added to the search history
-
-//WHEN I view current weather conditions for that city
-//THEN I am presented with the city name, the date, an icon representation of weather conditions, the temperature, the humidity, the wind speed, and the UV index
-
-//WHEN I view the UV index
-//THEN I am presented with a color that indicates whether the conditions are favorable, moderate, or severe
-
-//WHEN I view future weather conditions for that city
-//THEN I am presented with a 5-day forecast that displays the date, an icon representation of weather conditions, the temperature, the wind speed, and the humidity
-
-//WHEN I click on a city in the search history
-//THEN I am again presented with current and future conditions for that city
-
 let appID = "&appid=a1a6bda4ff081633f2f7eb1de4acaa4e";
-
 let search = $("#searchBtn");
 let index = 0;
 let date = moment().get("date");
@@ -24,9 +7,9 @@ let currentDate = moment().format("MMMM Do YYYY");
 let searchHistory = JSON.parse(localStorage.getItem("search")) || [];
 let weatherContainer = $(".weather-container");
 
-
 function whatsTheWeather(city) {
-
+    //WHEN I search for a city
+    //THEN I am presented with current and future conditions for that city and that city is added to the search history
     let weatherURL = "http://api.openweathermap.org/data/2.5/weather?q=" + city + appID + "&units=imperial";
     fetch(weatherURL).then(function (response) {
         response.json().then(data => {
@@ -35,8 +18,6 @@ function whatsTheWeather(city) {
             let currentMonth = todaysDate.getMonth();
             let currentYear = todaysDate.getFullYear();
             let weatherIcon = data.weather[0].icon;
-
-
             //build current day weather card
             $(".weather-container").html("");
             let weatherDiv = $('<div>', {
@@ -61,26 +42,14 @@ function whatsTheWeather(city) {
                 class: "card-text",
                 text: `Humidity: ${data.main.humidity} %`
             });
-
+            //WHEN I view current weather conditions for that city
+            //THEN I am presented with the city name, the date, an icon representation of weather conditions, the temperature, the humidity, the wind speed, and the UV index
             weatherDiv.appendTo($(".weather-container"));
             weatherH2.appendTo($(".current-day"));
             makeImg.appendTo($(".city-date"));
             weatherTemp.appendTo($(".current-day"));
             weatherWind.appendTo($(".current-day"));
             weatherHumidity.appendTo($(".current-day"));
-            // $(".weather-container").append("<div>").addClass("container col-md-12 card border-dark current-day ");
-            // $(".current-day").append("<h2>").addClass("card-title city-date");
-            // $(".city-date").append(`${data.name} (${currentMonth + 1}/${currentDay}/${currentYear})`);
-            // let makeImg = $('<img />', {
-            //     src: `https://openweathermap.org/img/wn/${weatherIcon}@2x.png`
-            // });
-            // makeImg.appendTo($(".city-date"));
-            // $(".current-day").append("<p>").addClass("card-text temp");
-            // $(".temp").append(`Temp: ${data.main.temp} F`)
-            // $(".current-day").append("<p>").addClass("card-text wind");
-            // $(".wind").append(`Wind Speed: ${data.wind.speed} MPH`)
-            // $(".current-day").append("<p>").addClass("card-text humidity");
-            // $(".humidity").append(`Humidity: ${data.main.humidity} %`)
             let lat = data.coord.lat;
             let lon = data.coord.lon;
             let oneCallURL = "http://api.openweathermap.org/data/2.5/onecall?lat=" + lat + "&lon=" + lon + appID;
@@ -96,6 +65,8 @@ function whatsTheWeather(city) {
                     $(".current-day").append("<p>").addClass("card-text uv");
                     $(".uv").append("UV Index: ");
                     uvBtn.appendTo($(".uv"));
+                    //WHEN I view the UV index
+                    //THEN I am presented with a color that indicates whether the conditions are favorable, moderate, or severe
                     if (currentUVI < 3) {
                         uvBtn.addClass("btn-success mb-2");
                     } else if (currentUVI > 2 && currentUVI < 6) {
@@ -109,7 +80,8 @@ function whatsTheWeather(city) {
             let forecastURL = "https://api.openweathermap.org/data/2.5/forecast?q=" + cityName + appID + "&units=imperial";
             fetch(forecastURL).then(function (responseFor) {
                 responseFor.json().then(data => {
-
+                    //WHEN I view future weather conditions for that city
+                    //THEN I am presented with a 5-day forecast that displays the date, an icon representation of weather conditions, the temperature, the wind speed, and the humidity
                     for (i = 0; i < $(".forecast-card").length; i++) {
                         $(".forecast-card")[i].innerHTML = "";
                         let forecastI = i * 8 + 4;
@@ -150,15 +122,14 @@ function whatsTheWeather(city) {
 
     })
 }
-
 //search button
 search.click(function () {
     event.preventDefault();
-
     //grab input
     let cityInput = $(".city").val().trim();
-
+    //send input to weather function
     whatsTheWeather(cityInput);
+    //send input to localstorage
     searchHistory.push(cityInput);
     localStorage.setItem("search", JSON.stringify(searchHistory));
     recentCities();
@@ -166,17 +137,20 @@ search.click(function () {
 
 function recentCities() {
     $(".history-div").html("");
-
     for (let i = 0; i < searchHistory.length; i++) {
         let historyBtn = $("<button>", {
             class: "mt-2 mb-2 me-2 btn btn-primary col-4 col-md-3 col-lg-2",
             text: `${searchHistory[i]}`,
             value: searchHistory[i]
         });
+        //make history buttons clickable
+        //WHEN I click on a city in the search history
+        //THEN I am again presented with current and future conditions for that city
         historyBtn.click(function () {
-
+            //history buttons send value as city to api weather call
             whatsTheWeather(historyBtn.val());
         })
+        //add new history button to recent cities section
         historyBtn.appendTo($(".history-div"));
     }
 }
