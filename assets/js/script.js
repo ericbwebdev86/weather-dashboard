@@ -21,48 +21,88 @@ let search = $("#searchBtn");
 let index = 0;
 let date = moment().get("date");
 let currentDate = moment().format("MMMM Do YYYY");
-let history = JSON.parse(localStorage.getItem("search")) || [];
+let searchHistory = JSON.parse(localStorage.getItem("search")) || [];
+let weatherContainer = $(".weather-container");
 
 
 function whatsTheWeather(city) {
+
     let weatherURL = "http://api.openweathermap.org/data/2.5/weather?q=" + city + appID + "&units=imperial";
     fetch(weatherURL).then(function (response) {
         response.json().then(data => {
-            console.log(city);
-            console.log(weatherURL);
-            console.log(data);
             let todaysDate = new Date(data.dt * 1000)
             let currentDay = todaysDate.getDate();
             let currentMonth = todaysDate.getMonth();
             let currentYear = todaysDate.getFullYear();
             let weatherIcon = data.weather[0].icon;
+
+
             //build current day weather card
-            $(".current-day").innerHTML = "";
-            $(".city-date").innerHTML = "";
-            $(".temp").innerHTML = "";
-            $(".wind").innerHTML = "";
-            $(".humidity").innerHTML = "";
-            $(".weather-container").append("<div>").addClass("container col-md-12 card border-dark current-day");
-            $(".current-day").append("<h2>").addClass("card-title city-date");
-            $(".city-date").append(`${data.name} (${currentMonth + 1}/${currentDay}/${currentYear})`);
-            console.log(weatherIcon);
+            $(".weather-container").html("");
+            let weatherDiv = $('<div>', {
+                class: "container col-md-12 card border-dark current-day border-2"
+            });
             let makeImg = $('<img />', {
                 src: `https://openweathermap.org/img/wn/${weatherIcon}@2x.png`
             });
+            let weatherH2 = $('<h2>', {
+                class: "card-title city-date",
+                text: `${data.name} (${currentMonth + 1}/${currentDay}/${currentYear})`
+            });
+            let weatherTemp = $('<p>', {
+                class: "card-text",
+                text: `Temp: ${data.main.temp} F`
+            });
+            let weatherWind = $('<p>', {
+                class: "card-text",
+                text: `Wind Speed: ${data.wind.speed} MPH`
+            });
+            let weatherHumidity = $('<p>', {
+                class: "card-text",
+                text: `Humidity: ${data.main.humidity} %`
+            });
+
+            weatherDiv.appendTo($(".weather-container"));
+            weatherH2.appendTo($(".current-day"));
             makeImg.appendTo($(".city-date"));
-            $(".current-day").append("<p>").addClass("card-text temp");
-            $(".temp").append(`Temp: ${data.main.temp} F`)
-            $(".current-day").append("<p>").addClass("card-text wind");
-            $(".wind").append(`Wind Speed: ${data.wind.speed} MPH`)
-            $(".current-day").append("<p>").addClass("card-text humidity");
-            $(".humidity").append(`Humidity: ${data.main.humidity} %`)
+            weatherTemp.appendTo($(".current-day"));
+            weatherWind.appendTo($(".current-day"));
+            weatherHumidity.appendTo($(".current-day"));
+            // $(".weather-container").append("<div>").addClass("container col-md-12 card border-dark current-day ");
+            // $(".current-day").append("<h2>").addClass("card-title city-date");
+            // $(".city-date").append(`${data.name} (${currentMonth + 1}/${currentDay}/${currentYear})`);
+            // let makeImg = $('<img />', {
+            //     src: `https://openweathermap.org/img/wn/${weatherIcon}@2x.png`
+            // });
+            // makeImg.appendTo($(".city-date"));
+            // $(".current-day").append("<p>").addClass("card-text temp");
+            // $(".temp").append(`Temp: ${data.main.temp} F`)
+            // $(".current-day").append("<p>").addClass("card-text wind");
+            // $(".wind").append(`Wind Speed: ${data.wind.speed} MPH`)
+            // $(".current-day").append("<p>").addClass("card-text humidity");
+            // $(".humidity").append(`Humidity: ${data.main.humidity} %`)
             let lat = data.coord.lat;
             let lon = data.coord.lon;
             let oneCallURL = "http://api.openweathermap.org/data/2.5/onecall?lat=" + lat + "&lon=" + lon + appID;
             fetch(oneCallURL).then(function (responseOC) {
                 responseOC.json().then(data => {
+                    console.log(data);
+                    let currentUVI = data.current.uvi;
+                    let uvBtn = $("<button>", {
+                        class: "col-1 btn ",
+                        text: `${currentUVI}`,
+                        value: currentUVI
+                    });
                     $(".current-day").append("<p>").addClass("card-text uv");
-                    $("p.uv").append($(`<span class="btn btn-success">${data.current.uvi}</span>`))
+                    $(".uv").append("UV Index: ");
+                    uvBtn.appendTo($(".uv"));
+                    if (currentUVI < 3) {
+                        uvBtn.addClass("btn-success mb-2");
+                    } else if (currentUVI > 2 && currentUVI < 6) {
+                        uvBtn.addClass("btn-warning mb-2");
+                    } else {
+                        uvBtn.addClass("btn-danger mb-2");
+                    }
                 })
             })
             let cityName = data.name;
@@ -77,7 +117,6 @@ function whatsTheWeather(city) {
                         let fcDay = fcDate.getDate();
                         let fcMonth = fcDate.getMonth();
                         let fcYear = fcDate.getFullYear();
-                        console.log(data.list[forecastI].main.temp)
                         let makeH4 = $("<h4>", {
                             class: "card-title fc-city-date fc-item",
                             text: `${data.city.name} (${fcMonth + 1}/${fcDay}/${fcYear})`
@@ -99,17 +138,10 @@ function whatsTheWeather(city) {
                             text: `Humidity: ${data.list[forecastI].main.humidity} %`
                         });
                         makeH4.appendTo($(".forecast-card")[i]);
-                        // $(".fc-city-date").append(`${data.city.name} (${fcMonth + 1}/${fcDay}/${fcYear})`);
-
                         makeFCImg.appendTo($(".forecast-card")[i]);
-                        //.attr("src","https://openweathermap.org/img/wn/" + data.list[forecastI].weather[0].icon + "@2x.png");
-
                         makeTemp.appendTo($(".forecast-card")[i]);
-                        // $(".fc-temp").append(`Temp: ${data.main.temp} F`);
-
                         makeWind.appendTo($(".forecast-card")[i]);
                         makeHumidity.appendTo($(".forecast-card")[i]);
-                        // $(".fc-humidity").append(`Humidity: ${data.list.main.humidity} %`);
                     }
                 })
             })
@@ -119,24 +151,30 @@ function whatsTheWeather(city) {
     })
 }
 
+//search button
 search.click(function () {
     event.preventDefault();
+
+    //grab input
     let cityInput = $(".city").val().trim();
+
     whatsTheWeather(cityInput);
-    history.push(cityInput);
-    localStorage.setItem("search", JSON.stringify(history));
+    searchHistory.push(cityInput);
+    localStorage.setItem("search", JSON.stringify(searchHistory));
     recentCities();
 })
 
 function recentCities() {
-    $(".history-div").innerHTML = "";
-    for (let i = 0; i < history.length; i++) {
+    $(".history-div").html("");
+
+    for (let i = 0; i < searchHistory.length; i++) {
         let historyBtn = $("<button>", {
-            class: "mt-2 mb-2 me-2 btn btn-secondary col-4 col-md-3 col-lg-2",
-            text: `${history[i]}`,
-            value: history[i]
+            class: "mt-2 mb-2 me-2 btn btn-primary col-4 col-md-3 col-lg-2",
+            text: `${searchHistory[i]}`,
+            value: searchHistory[i]
         });
         historyBtn.click(function () {
+
             whatsTheWeather(historyBtn.val());
         })
         historyBtn.appendTo($(".history-div"));

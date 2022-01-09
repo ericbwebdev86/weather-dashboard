@@ -1,4 +1,16 @@
+/* $blue:    #0d6efd;
+$indigo:  #6610f2;
+$purple:  #6f42c1; */
+
 img {
-    height:50px;
-    width:50px;
+    height:70px;
+    width:70px;
+}
+.current-day {
+    background: radial-gradient(circle, rgba(238,174,202,1) 0%, rgba(148,187,233,1) 100%);
+}
+.forecast {
+    background-color: #8BC6EC;
+background-image: linear-gradient(135deg, #8BC6EC 0%, #9599E2 100%);
+
 }
