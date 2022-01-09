@@ -11,7 +11,7 @@ let weatherContainer = $(".weather-container");
 function whatsTheWeather(city) {
     //WHEN I search for a city
     //THEN I am presented with current and future conditions for that city and that city is added to the search history
-    let weatherURL = "http://api.openweathermap.org/data/2.5/weather?q=" + city + appID + "&units=imperial";
+    let weatherURL = "https://api.openweathermap.org/data/2.5/weather?q=" + city + appID + "&units=imperial";
     fetch(weatherURL).then(function (response) {
         response.json().then(data => {
             let todaysDate = new Date(data.dt * 1000)
@@ -53,7 +53,7 @@ function whatsTheWeather(city) {
             weatherHumidity.appendTo($(".current-day"));
             let lat = data.coord.lat;
             let lon = data.coord.lon;
-            let oneCallURL = "http://api.openweathermap.org/data/2.5/onecall?lat=" + lat + "&lon=" + lon + appID;
+            let oneCallURL = "https://api.openweathermap.org/data/2.5/onecall?lat=" + lat + "&lon=" + lon + appID;
             fetch(oneCallURL).then(function (responseOC) {
                 responseOC.json().then(data => {
                     console.log(data);
